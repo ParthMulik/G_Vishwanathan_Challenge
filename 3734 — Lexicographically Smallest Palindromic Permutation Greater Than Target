@@ -1,1 +1,115 @@
 
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    string lexPalindromicPermutation(string s, string target) {
+        int n = s.length();
+        int half = n / 2;
+        vector<int> cnt(26, 0);
+        for (char c : s) {
+            cnt[c - 'a']++;
+        }
+        
+        int oddChar = -1;
+        for (int i = 0; i < 26; i++) {
+            if (cnt[i] % 2 != 0) {
+                if (oddChar != -1) {
+                    return ""; // More than one odd frequency char -> impossible
+                }
+                oddChar = i;
+            }
+        }
+        
+        vector<int> leftCnt(26, 0);
+        for (int i = 0; i < 26; i++) {
+            leftCnt[i] = cnt[i] / 2;
+        }
+        
+        // Case 1: Try exact match for the left half
+        bool ok = true;
+        vector<int> remain = leftCnt;
+        string left = "";
+        for (int i = 0; i < half; i++) {
+            int c = target[i] - 'a';
+            if (remain[c] > 0) {
+                left += (char)(c + 'a');
+                remain[c]--;
+            } else {
+                ok = false;
+                break;
+            }
+        }
+        
+        if (ok) {
+            string candidate = left;
+            if (oddChar != -1) candidate += (char)(oddChar + 'a');
+            string right = left;
+            reverse(right.begin(), right.end());
+            candidate += right;
+            if (candidate > target) {
+                return candidate;
+            }
+        }
+        
+        // Case 2: Diverge at some position p < half
+        for (int p = half - 1; p >= 0; p--) {
+            remain = leftCnt;
+            left = "";
+            bool possible = true;
+            
+            // 1. Match exactly up to p - 1
+            for (int i = 0; i < p; i++) {
+                int c = target[i] - 'a';
+                if (remain[c] > 0) {
+                    left += (char)(c + 'a');
+                    remain[c]--;
+                } else {
+                    possible = false;
+                    break;
+                }
+            }
+            
+            if (!possible) continue;
+            
+            // 2. Diverge at position p (pick smallest available char > target[p])
+            int targetChar = target[p] - 'a';
+            bool found = false;
+            for (int c = targetChar + 1; c < 26; c++) {
+                if (remain[c] > 0) {
+                    left += (char)(c + 'a');
+                    remain[c]--;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) continue;
+            
+            // 3. Fill the rest of the left half with the smallest available chars
+            for (int i = p + 1; i < half; i++) {
+                for (int c = 0; c < 26; c++) {
+                    if (remain[c] > 0) {
+                        left += (char)(c + 'a');
+                        remain[c]--;
+                        break;
+                    }
+                }
+            }
+            
+            string candidate = left;
+            if (oddChar != -1) candidate += (char)(oddChar + 'a');
+            string right = left;
+            reverse(right.begin(), right.end());
+            candidate += right;
+            
+            return candidate; 
+        }
+        
+        return "";
+    }
+};
