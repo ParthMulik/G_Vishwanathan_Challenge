@@ -1,1 +1,43 @@
 
+class Solution {
+public:
+    vector<int> lexicographicallySmallestArray(vector<int>& nums, int limit) {
+        int n = nums.size();
+
+        vector<int> idx(n);
+        iota(idx.begin(), idx.end(), 0);
+
+        // Sort indices according to their values.
+        sort(idx.begin(), idx.end(), [&](int a, int b) {
+            return nums[a] < nums[b];
+        });
+
+        vector<int> ans(n);
+
+        int i = 0;
+
+        while (i < n) {
+            int j = i + 1;
+
+            // Same connected group.
+            while (j < n &&
+                   nums[idx[j]] - nums[idx[j - 1]] <= limit) {
+                j++;
+            }
+
+            // Indices belonging to this group.
+            vector<int> positions(idx.begin() + i, idx.begin() + j);
+
+            // Put smallest values at smallest original indices.
+            sort(positions.begin(), positions.end());
+
+            for (int k = 0; k < positions.size(); k++) {
+                ans[positions[k]] = nums[idx[i + k]];
+            }
+
+            i = j;
+        }
+
+        return ans;
+    }
+};
