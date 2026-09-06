@@ -1,1 +1,29 @@
 
+class Solution {
+public:
+    int lowerBound(vector<int>& nums, int target) {
+        int l = 0, r = nums.size();
+
+        while (l < r) {
+            int mid = l + (r - l) / 2;
+
+            if (nums[mid] >= target)
+                r = mid;
+            else
+                l = mid + 1;
+        }
+
+        return l;
+    }
+
+    vector<int> searchRange(vector<int>& nums, int target) {
+        int left = lowerBound(nums, target);
+
+        if (left == nums.size() || nums[left] != target)
+            return {-1, -1};
+
+        int right = lowerBound(nums, target + 1) - 1;
+
+        return {left, right};
+    }
+};
