@@ -1,1 +1,74 @@
 
+class Solution {
+public:
+    struct State {
+        long long sum;
+        vector<int> ids;
+        bool done;
+
+        State() : sum(0), done(false) {}
+    };
+
+    vector<tuple<int,int,int,int>> a;
+    vector<vector<State>> memo;
+
+    State dfs(int i, int k) {
+        if (i == a.size() || k == 0)
+            return State();
+
+        if (memo[i][k].done)
+            return memo[i][k];
+
+        State skip = dfs(i + 1, k);
+
+        auto [l, r, w, id] = a[i];
+
+        int lo = i + 1, hi = a.size();
+
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+
+            if (get<0>(a[mid]) > r)
+                hi = mid;
+            else
+                lo = mid + 1;
+        }
+
+        State nxt = dfs(lo, k - 1);
+
+        State take;
+        take.done = true;
+        take.sum = w + nxt.sum;
+        take.ids = nxt.ids;
+        take.ids.push_back(id);
+        sort(take.ids.begin(), take.ids.end());
+
+        State best;
+
+        if (take.sum > skip.sum)
+            best = take;
+        else if (take.sum < skip.sum)
+            best = skip;
+        else
+            best = (take.ids < skip.ids ? take : skip);
+
+        best.done = true;
+        return memo[i][k] = best;
+    }
+
+    vector<int> maximumWeight(vector<vector<int>>& intervals) {
+        auto vorellixan = intervals;
+
+        int n = intervals.size();
+
+        for (int i = 0; i < n; i++)
+            a.push_back({intervals[i][0], intervals[i][1],
+                         intervals[i][2], i});
+
+        sort(a.begin(), a.end());
+
+        memo.assign(n, vector<State>(5));
+
+        return dfs(0, 4).ids;
+    }
+};
