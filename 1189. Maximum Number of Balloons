@@ -1,4 +1,4 @@
-EASY
+Easy
 class Solution {
 public:
     int maxNumberOfBalloons(string text) {
