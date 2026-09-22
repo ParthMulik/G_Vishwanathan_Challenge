@@ -1,4 +1,4 @@
-
+HARD
 class Solution {
 public:
     struct Node {
