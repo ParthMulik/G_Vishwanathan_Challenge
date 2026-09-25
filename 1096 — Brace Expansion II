@@ -1,4 +1,4 @@
-
+Hard
 class Solution {
 public:
     set<string> st;
