@@ -1,4 +1,4 @@
-HR
+easy
 class Solution {
 public:
     bool isValid(string s) {
