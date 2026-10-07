@@ -1,1 +1,56 @@
 
+class Solution {
+public:
+    vector<string> ans;
+
+    void solve(string s, int start, int l, int r) {
+        int balance = 0;
+
+        for (int i = start; i < s.size(); i++) {
+            if (s[i] == '(')
+                balance++;
+            else if (s[i] == ')')
+                balance--;
+
+            if (balance >= 0)
+                continue;
+
+            for (int j = start; j <= i; j++) {
+                if (s[j] == ')' &&
+                    (j == start || s[j - 1] != ')')) {
+                    solve(s.substr(0, j) + s.substr(j + 1),
+                          i, l, r - 1);
+                }
+            }
+
+            return;
+        }
+
+        reverse(s.begin(), s.end());
+
+        if (l > 0) {
+            solve(s, 0, r, l - 1);
+        } else {
+            ans.push_back(s);
+        }
+    }
+
+    vector<string> removeInvalidParentheses(string s) {
+        int l = 0, r = 0;
+
+        for (char c : s) {
+            if (c == '(')
+                l++;
+            else if (c == ')') {
+                if (l > 0)
+                    l--;
+                else
+                    r++;
+            }
+        }
+
+        solve(s, 0, l, r);
+
+        return ans;
+    }
+};
