@@ -1,56 +1,70 @@
-Hard
 class Solution {
 public:
-    vector<string> ans;
+    unordered_set<string> ans;
+    int n;
 
-    void solve(string s, int start, int l, int r) {
-        int balance = 0;
-
-        for (int i = start; i < s.size(); i++) {
-            if (s[i] == '(')
-                balance++;
-            else if (s[i] == ')')
-                balance--;
-
-            if (balance >= 0)
-                continue;
-
-            for (int j = start; j <= i; j++) {
-                if (s[j] == ')' &&
-                    (j == start || s[j - 1] != ')')) {
-                    solve(s.substr(0, j) + s.substr(j + 1),
-                          i, l, r - 1);
-                }
-            }
-
+    void dfs(string &s, int i, int leftRemove, int rightRemove,
+             int leftCount, int rightCount, string &cur) {
+        if (i == n) {
+            if (leftRemove == 0 && rightRemove == 0)
+                ans.insert(cur);
             return;
         }
 
-        reverse(s.begin(), s.end());
+        if (n - i < leftRemove + rightRemove)
+            return;
 
-        if (l > 0) {
-            solve(s, 0, r, l - 1);
-        } else {
-            ans.push_back(s);
+        if (leftCount < rightCount)
+            return;
+
+        char c = s[i];
+
+        if (c == '(' && leftRemove > 0) {
+            dfs(s, i + 1, leftRemove - 1, rightRemove,
+                leftCount, rightCount, cur);
         }
+
+        if (c == ')' && rightRemove > 0) {
+            dfs(s, i + 1, leftRemove, rightRemove - 1,
+                leftCount, rightCount, cur);
+        }
+
+        cur.push_back(c);
+
+        if (c == '(') {
+            dfs(s, i + 1, leftRemove, rightRemove,
+                leftCount + 1, rightCount, cur);
+        } else if (c == ')') {
+            dfs(s, i + 1, leftRemove, rightRemove,
+                leftCount, rightCount + 1, cur);
+        } else {
+            dfs(s, i + 1, leftRemove, rightRemove,
+                leftCount, rightCount, cur);
+        }
+
+        cur.pop_back();
     }
 
     vector<string> removeInvalidParentheses(string s) {
-        int l = 0, r = 0;
+        n = s.size();
+
+        int leftRemove = 0;
+        int rightRemove = 0;
 
         for (char c : s) {
-            if (c == '(')
-                l++;
-            else if (c == ')') {
-                if (l > 0)
-                    l--;
+            if (c == '(') {
+                leftRemove++;
+            } else if (c == ')') {
+                if (leftRemove > 0)
+                    leftRemove--;
                 else
-                    r++;
+                    rightRemove++;
             }
         }
 
-        solve(s, 0, l, r);
+        string cur;
+        dfs(s, 0, leftRemove, rightRemove, 0, 0, cur);
 
-        return ans;
+        return vector<string>(ans.begin(), ans.end());
     }
 };
