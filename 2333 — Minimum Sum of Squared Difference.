@@ -1,1 +1,37 @@
 
+class Solution {
+public:
+    long long minSumSquareDiff(vector<int>& nums1, vector<int>& nums2, int k1, int k2) {
+        vector<int> diff(nums1.size());
+        int k = k1 + k2;
+        long long total = 0;
+
+        for (int i = 0; i < nums1.size(); i++) {
+            diff[i] = abs(nums1[i] - nums2[i]);
+            total += diff[i];
+        }
+
+        if (total <= k)
+            return 0;
+
+        int maxDiff = *max_element(diff.begin(), diff.end());
+        vector<int> freq(maxDiff + 1, 0);
+
+        for (int d : diff)
+            freq[d]++;
+
+        for (int d = maxDiff; d > 0 && k > 0; d--) {
+            int take = min(k, freq[d]);
+            freq[d] -= take;
+            freq[d - 1] += take;
+            k -= take;
+        }
+
+        long long ans = 0;
+
+        for (int d = 1; d < freq.size(); d++)
+            ans += 1LL * d * d * freq[d];
+
+        return ans;
+    }
+};
