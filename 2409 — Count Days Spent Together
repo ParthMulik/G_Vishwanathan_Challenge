@@ -1,4 +1,4 @@
-
+Medium
 class Solution {
 public:
     int countDaysTogether(string arriveAlice, string leaveAlice,
