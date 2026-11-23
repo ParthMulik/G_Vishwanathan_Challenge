@@ -1,3 +1,4 @@
+Medium
 class ProductOfNumbers {
     vector<int> prefix;
 
